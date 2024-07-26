@@ -1,0 +1,66 @@
+name: colmap
+version: "3.10"
+confinement: strict
+summary: Structure-from-Motion and Multi-View Stereo 
+description: COLMAP is a general-purpose Structure-from-Motion (SfM) and Multi-View Stereo (MVS) pipeline with a graphical and command-line interface. It offers a wide range of features for reconstruction of ordered and unordered image collections.
+base: core22
+
+apps:
+    colmap:
+        command: bin/desktop-launch colmap
+        plugs: [home, opengl, x11]
+        environment:
+            LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/lapack:$SNAP/usr/lib/x86_64-linux-gnu/blas"
+parts:
+    desktop-qt5:
+        source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+        source-subdir: qt
+        plugin: make
+        make-parameters: ["FLAVOR=qt5"]
+    colmap:
+        plugin: cmake
+        cmake-parameters:
+            - -DCMAKE_BUILD_TYPE=Release
+            - -DCMAKE_C_COMPILER=/usr/bin/gcc-10
+            - -DCMAKE_CXX_COMPILER=/usr/bin/g++-10
+            - -DCMAKE_CUDA_HOST_COMPILER=/usr/bin/g++-10
+            - -DCMAKE_CUDA_ARCHITECTURES=61
+            - -DCMAKE_INSTALL_PREFIX=/
+        source: https://github.com/colmap/colmap.git
+        source-tag: $SNAPCRAFT_PROJECT_VERSION
+        source-depth: 1
+        build-packages:
+            - g++-10
+            - libstdc++-10-dev
+            - libboost-program-options-dev
+            - libboost-filesystem-dev
+            - libboost-graph-dev
+            - libboost-system-dev
+            - libeigen3-dev
+            - libflann-dev
+            - libfreeimage-dev
+            - libmetis-dev
+            - libgoogle-glog-dev
+            - libsqlite3-dev
+            - libglew-dev
+            - qtbase5-dev
+            - libqt5opengl5-dev
+            - libcgal-dev
+            - libceres-dev
+            - nvidia-cuda-dev
+            - nvidia-cuda-toolkit
+        stage-packages:
+            - libboost-program-options1.74.0
+            - libboost-filesystem1.74.0
+            - libboost-graph1.74.0
+            - libboost-system1.74.0
+            - libflann1.9
+            - libfreeimage3
+            - libmetis5
+            - libgoogle-glog0v5
+            - libsqlite3-0
+            - libglew2.2
+            - libqt5opengl5
+            - libceres2
+            - libcudart11.0
+        after: [desktop-qt5]
